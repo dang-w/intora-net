@@ -1,0 +1,8 @@
+export interface PieceMeta {
+  id: string;
+  designation: string;
+  subtitle: string;
+  status: 'live' | 'wip' | 'planned';
+  date?: string;
+  description?: string;
+}
