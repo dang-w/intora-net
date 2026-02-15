@@ -1,7 +1,14 @@
 import { PieceMeta } from './types';
 
 export const pieces: PieceMeta[] = [
-  // INT/001 will be added here when built
+  {
+    id: '001',
+    designation: 'INT/001',
+    subtitle: 'DRIFT',
+    status: 'live',
+    date: '2026-02-15',
+    description: 'Flow field rendered through oriented text characters',
+  },
 ];
 
 export function getPiece(id: string): PieceMeta | undefined {
