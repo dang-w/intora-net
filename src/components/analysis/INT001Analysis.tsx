@@ -185,6 +185,24 @@ export default function INT001Analysis() {
               in the fastest-flowing channels.
             </p>
           </div>
+          <div>
+            <div className="text-text">v4 — Warmth and flow polish</div>
+            <div className="mt-2 space-y-1 text-xs">
+              <div>
+                <span className="text-amber">COLOUR WARMTH</span>{' '}
+                <span className="text-text-subtle">amber 0.70 → 0.60, amber_light 0.55 → 0.45</span>{' '}
+                — Widened the warm colour bands so amber tones dominate the visible flow.
+                Canvas impression shifted from grey-brown to warm amber-brown.
+              </div>
+              <div>
+                <span className="text-amber">FLOW LENGTH</span>{' '}
+                <span className="text-text-subtle">noise scale 0.015 → 0.011, lacunarity 2.0 → 1.8</span>{' '}
+                — Broader sweeping currents with smoother internal transitions. Flow lines
+                now extend 15–20+ cells before curving. Directional bands clearly visible
+                at arm&apos;s length.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -200,11 +218,11 @@ export default function INT001Analysis() {
   target_density · ~130 cols × 55 rows @ 1080p
 
 NOISE (flow phase)
-  scale ·········· 0.015
+  scale ·········· 0.011
   z_speed ········ 0.0004
   octaves ········ 3
   persistence ···· 0.5
-  lacunarity ····· 2.0
+  lacunarity ····· 1.8
 
 CHARACTER THRESHOLDS
   empty ·········· magnitude < 0.30
@@ -214,10 +232,10 @@ CHARACTER THRESHOLDS
 
 COLOUR THRESHOLDS
   accent (orange) · magnitude > 0.82
-  amber ··········· magnitude > 0.70
-  amber_light ····· magnitude > 0.55
-  muted ··········· magnitude > 0.40
-  subtle ·········· magnitude ≤ 0.40`}
+  amber ··········· magnitude > 0.60
+  amber_light ····· magnitude > 0.45
+  muted ··········· magnitude > 0.38
+  subtle ·········· magnitude ≤ 0.38`}
           </pre>
         </div>
       </section>

@@ -63,7 +63,7 @@ function fractalNoise(noise3D: NoiseFunction3D, x: number, y: number, z: number)
     value += noise3D(x * frequency, y * frequency, z * frequency) * amplitude;
     maxAmplitude += amplitude;
     amplitude *= 0.5;
-    frequency *= 2.0;
+    frequency *= 1.8;
   }
 
   return value / maxAmplitude;
@@ -82,19 +82,19 @@ function getNoiseParams(phase: Phase, phaseProgress: number) {
   switch (phase) {
     case 'emergence':
       return {
-        noiseScale: 0.025 - 0.01 * phaseProgress,  // Starts tighter, coheres to base
+        noiseScale: 0.022 - 0.011 * phaseProgress,  // Starts tighter, coheres to base
         zSpeed: 0.0004,
         magnitudeMultiplier: phaseProgress,
       };
     case 'flow':
       return {
-        noiseScale: 0.015,                           // Base scale — broad sweeping currents
+        noiseScale: 0.011,                            // Base scale — broad sweeping currents
         zSpeed: 0.0004,
         magnitudeMultiplier: 1,
       };
     case 'turbulence':
       return {
-        noiseScale: 0.015 + 0.025 * phaseProgress,  // Fragments toward dissolution
+        noiseScale: 0.011 + 0.029 * phaseProgress,   // Fragments toward dissolution
         zSpeed: 0.0004 + 0.002 * phaseProgress,
         magnitudeMultiplier: 1,
       };
@@ -112,7 +112,7 @@ function getNoiseParams(phase: Phase, phaseProgress: number) {
       };
     case 'reacquisition':
       return {
-        noiseScale: 0.025 - 0.01 * phaseProgress,
+        noiseScale: 0.022 - 0.011 * phaseProgress,
         zSpeed: 0.0004,
         magnitudeMultiplier: phaseProgress * 0.5,
       };
@@ -143,11 +143,11 @@ function getChar(angle: number, magnitude: number, phase: Phase, rand: () => num
 function getColor(magnitude: number, phase: Phase): string {
   if (phase === 'terminal' || phase === 'reacquisition') return PALETTE.textSubtle;
 
-  if (magnitude > 0.82) return PALETTE.accent;      // Orange — rare hot streaks
-  if (magnitude > 0.70) return PALETTE.amber;        // Golden amber — strong flow
-  if (magnitude > 0.55) return PALETTE.amberLight;   // Amber light — medium flow
-  if (magnitude > 0.40) return PALETTE.textMuted;    // Muted — quiet flow
-  return PALETTE.textSubtle;                          // Ghost — barely there
+  if (magnitude > 0.82) return PALETTE.accent;      // Hot — rare orange streaks
+  if (magnitude > 0.60) return PALETTE.amber;        // Dominant warm tone
+  if (magnitude > 0.45) return PALETTE.amberLight;   // Secondary warm tone
+  if (magnitude > 0.38) return PALETTE.textMuted;    // Edges of flow
+  return PALETTE.textSubtle;                          // Ghost
 }
 
 interface PieceProps {
