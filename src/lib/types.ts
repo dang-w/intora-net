@@ -6,4 +6,8 @@ export interface PieceMeta {
   date?: string;
   description?: string;
   hasAnalysis?: boolean;
+  hasAudio?: boolean;
+  version?: string;
+  lastModified?: string;
+  changelog?: string[];
 }

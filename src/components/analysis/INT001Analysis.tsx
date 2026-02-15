@@ -6,6 +6,7 @@ export default function INT001Analysis() {
         <div className="text-text-subtle">═══════════════════════════════════════════</div>
         <div className="text-text-muted">CLASSIFICATION: OPEN · DATE: 2026-02-15</div>
         <div className="text-text-muted">ANALYST: INTORA SYSTEMS</div>
+        <div className="text-text-muted">VERSION: 1.0</div>
       </header>
 
       {/* --- CONCEPT --- */}
