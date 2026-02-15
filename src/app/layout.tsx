@@ -21,6 +21,20 @@ export const metadata: Metadata = {
     description: 'Signal catalogue — constrained text-based generative art series',
     siteName: 'INT ARCHIVE · INTORA SYSTEMS',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'INT ARCHIVE — Signal catalogue by Intora Systems',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'INT ARCHIVE',
+    description: 'Signal catalogue — constrained text-based generative art series',
+    images: ['/og-image.png'],
   },
 };
 
