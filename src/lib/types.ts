@@ -5,4 +5,5 @@ export interface PieceMeta {
   status: 'live' | 'wip' | 'planned';
   date?: string;
   description?: string;
+  hasAnalysis?: boolean;
 }

@@ -10,7 +10,15 @@ const CELL_WIDTH = 14;
 const CELL_HEIGHT = 20;
 
 // --- Characters ---
+// Primary: directional flow (8 directions mapped to angle)
 const FLOW_CHARS = ['─', '╲', '│', '╱', '─', '╲', '│', '╱'];
+// Lighter variants scattered at ~12% probability for texture within currents
+const FLOW_CHARS_LIGHT = ['╌', '╲', '╎', '╱', '╌', '╲', '╎', '╱'];
+// Ghost: noise floor / barely-there signal
+const GHOST_CHARS = ['·', '∙', ':', '∶'];
+// Block elements: only used during emergence/dissolution, not during flow
+const BLOCK_CHARS = ['░', '▒'];
+// Noise: dissolution static
 const NOISE_CHARS = ['∴', '∶', '◦', '·'];
 
 // --- Cycle timing (ms) ---
@@ -44,10 +52,29 @@ function mulberry32(seed: number): () => number {
   };
 }
 
+// --- Fractal noise (3 octaves) ---
+function fractalNoise(noise3D: NoiseFunction3D, x: number, y: number, z: number): number {
+  let value = 0;
+  let amplitude = 1;
+  let frequency = 1;
+  let maxAmplitude = 0;
+
+  for (let i = 0; i < 3; i++) {
+    value += noise3D(x * frequency, y * frequency, z * frequency) * amplitude;
+    maxAmplitude += amplitude;
+    amplitude *= 0.5;
+    frequency *= 2.0;
+  }
+
+  return value / maxAmplitude;
+}
+
 // --- Core functions ---
-function angleToChar(angle: number): string {
+function angleToChar(angle: number, rand: () => number): string {
   const normalised = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
   const index = Math.round(normalised / (Math.PI / 4)) % 8;
+  // ~12% chance of lighter variant for texture
+  if (rand() < 0.12) return FLOW_CHARS_LIGHT[index];
   return FLOW_CHARS[index];
 }
 
@@ -55,66 +82,72 @@ function getNoiseParams(phase: Phase, phaseProgress: number) {
   switch (phase) {
     case 'emergence':
       return {
-        noiseScale: 0.06 - 0.03 * phaseProgress,  // High → low (patterns cohere)
-        zSpeed: 0.0005,
-        magnitudeMultiplier: phaseProgress,          // Fade in
+        noiseScale: 0.025 - 0.01 * phaseProgress,  // Starts tighter, coheres to base
+        zSpeed: 0.0004,
+        magnitudeMultiplier: phaseProgress,
       };
     case 'flow':
       return {
-        noiseScale: 0.03,
-        zSpeed: 0.0005,
+        noiseScale: 0.015,                           // Base scale — broad sweeping currents
+        zSpeed: 0.0004,
         magnitudeMultiplier: 1,
       };
     case 'turbulence':
       return {
-        noiseScale: 0.03 + 0.04 * phaseProgress,   // Patterns fragment
-        zSpeed: 0.0005 + 0.002 * phaseProgress,     // Speed increases
+        noiseScale: 0.015 + 0.025 * phaseProgress,  // Fragments toward dissolution
+        zSpeed: 0.0004 + 0.002 * phaseProgress,
         magnitudeMultiplier: 1,
       };
     case 'dissolution':
       return {
-        noiseScale: 0.07,
+        noiseScale: 0.04,
         zSpeed: 0.002,
-        magnitudeMultiplier: 1 - phaseProgress * 0.9,  // Fade out
+        magnitudeMultiplier: 1 - phaseProgress * 0.9,
       };
     case 'terminal':
       return {
-        noiseScale: 0.07,
+        noiseScale: 0.04,
         zSpeed: 0.001,
         magnitudeMultiplier: 0.05,
       };
     case 'reacquisition':
       return {
-        noiseScale: 0.06 - 0.03 * phaseProgress,
-        zSpeed: 0.0005,
+        noiseScale: 0.025 - 0.01 * phaseProgress,
+        zSpeed: 0.0004,
         magnitudeMultiplier: phaseProgress * 0.5,
       };
   }
 }
 
 function getChar(angle: number, magnitude: number, phase: Phase, rand: () => number): string {
-  // Dissolution dropout
+  // Dissolution/terminal: progressive dropout with noise static
   if (phase === 'dissolution' || phase === 'terminal') {
     if (rand() > magnitude * 2) {
-      return rand() < 0.1 ? NOISE_CHARS[Math.floor(rand() * NOISE_CHARS.length)] : ' ';
+      if (rand() < 0.08) return NOISE_CHARS[Math.floor(rand() * NOISE_CHARS.length)];
+      if (rand() < 0.05) return BLOCK_CHARS[Math.floor(rand() * BLOCK_CHARS.length)];
+      return ' ';
     }
   }
 
-  if (magnitude < 0.15) return ' ';
-  if (magnitude < 0.25) return '·';
-  if (magnitude < 0.35) return '░';
-  if (magnitude < 0.45) return '▒';
-  return angleToChar(angle);
+  // Emergence: block noise breaking into flow
+  if (phase === 'emergence' && rand() < 0.15 * (1 - magnitude)) {
+    return BLOCK_CHARS[Math.floor(rand() * BLOCK_CHARS.length)];
+  }
+
+  // Core thresholds — generous negative space
+  if (magnitude < 0.30) return ' ';
+  if (magnitude < 0.40) return GHOST_CHARS[Math.floor(rand() * GHOST_CHARS.length)];
+  return angleToChar(angle, rand);
 }
 
 function getColor(magnitude: number, phase: Phase): string {
   if (phase === 'terminal' || phase === 'reacquisition') return PALETTE.textSubtle;
 
-  if (magnitude > 0.8) return PALETTE.accent;
-  if (magnitude > 0.6) return PALETTE.amber;
-  if (magnitude > 0.4) return PALETTE.amberLight;
-  if (magnitude > 0.25) return PALETTE.textMuted;
-  return PALETTE.textSubtle;
+  if (magnitude > 0.82) return PALETTE.accent;      // Orange — rare hot streaks
+  if (magnitude > 0.70) return PALETTE.amber;        // Golden amber — strong flow
+  if (magnitude > 0.55) return PALETTE.amberLight;   // Amber light — medium flow
+  if (magnitude > 0.40) return PALETTE.textMuted;    // Muted — quiet flow
+  return PALETTE.textSubtle;                          // Ghost — barely there
 }
 
 interface PieceProps {
@@ -134,7 +167,7 @@ export default function INT001Drift({ width, height }: PieceProps) {
     const cols = Math.floor(width / CELL_WIDTH);
     const rows = Math.floor(height / CELL_HEIGHT);
 
-    // Deterministic per-frame random for dissolution effects
+    // Deterministic per-frame random for dissolution/character variation
     let frameRandSeed = 0;
     function frameRand(): number {
       frameRandSeed = (frameRandSeed * 16807 + 0) % 2147483647;
@@ -159,7 +192,6 @@ export default function INT001Drift({ width, height }: PieceProps) {
       if (phaseElapsed >= phaseDuration) {
         const currentIndex = PHASE_ORDER.indexOf(state.phase);
         if (currentIndex === PHASE_ORDER.length - 1) {
-          // End of reacquisition → new cycle
           return initCycle(timestamp);
         }
         const nextPhase = PHASE_ORDER[currentIndex + 1];
@@ -205,14 +237,16 @@ export default function INT001Drift({ width, height }: PieceProps) {
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          const x = col * params.noiseScale;
-          const y = row * params.noiseScale;
-          const z = timeOffset * params.zSpeed;
+          const nx = col * params.noiseScale;
+          const ny = row * params.noiseScale;
+          const nz = timeOffset * params.zSpeed;
 
-          const noiseValue = cycleState.noise3D(x, y, z);
+          // Fractal noise for angle — broad sweeping currents with subtle texture
+          const noiseValue = fractalNoise(cycleState.noise3D, nx, ny, nz);
           const angle = noiseValue * Math.PI * 2;
 
-          const magNoise = (cycleState.noise3D(x * 2, y * 2, z + 100) + 1) / 2;
+          // Separate magnitude sample at different frequency
+          const magNoise = (fractalNoise(cycleState.noise3D, nx * 1.7, ny * 1.7, nz + 100) + 1) / 2;
           const magnitude = magNoise * params.magnitudeMultiplier;
 
           const char = getChar(angle, magnitude, cycleState.phase, frameRand);

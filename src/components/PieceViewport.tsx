@@ -19,6 +19,14 @@ export default function PieceViewport({ piece, children }: PieceViewportProps) {
           <span>
             {piece.designation} — {piece.subtitle}
           </span>
+          {piece.hasAnalysis && (
+            <Link
+              href={`/int/${piece.id}/analysis`}
+              className="text-accent hover:text-amber transition-colors"
+            >
+              ANALYSIS
+            </Link>
+          )}
         </div>
         <span>intora.net</span>
       </div>

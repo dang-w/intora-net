@@ -8,6 +8,7 @@ export const pieces: PieceMeta[] = [
     status: 'live',
     date: '2026-02-15',
     description: 'Flow field rendered through oriented text characters',
+    hasAnalysis: true,
   },
 ];
 
