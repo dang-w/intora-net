@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getLivePieces } from '@/lib/registry';
+import PieceThumbnail from '@/components/PieceThumbnail';
 
 const livePieces = getLivePieces();
 
@@ -46,12 +47,15 @@ export default function CataloguePage() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-6">
             {livePieces.map(piece => (
-              <div key={piece.id}>
+              <div
+                key={piece.id}
+                className="group px-2 -mx-2 py-2 hover:bg-surface-raised transition-colors"
+              >
                 <Link
                   href={`/int/${piece.id}`}
-                  className="group block text-sm hover:bg-surface-raised transition-colors px-2 py-1 -mx-2"
+                  className="block text-sm"
                 >
                   <div className="flex items-baseline gap-2">
                     <span className="text-amber">{piece.designation}</span>
@@ -74,11 +78,16 @@ export default function CataloguePage() {
                 {piece.hasAnalysis && (
                   <Link
                     href={`/int/${piece.id}/analysis`}
-                    className="block text-sm text-text-subtle hover:text-text-muted transition-colors px-2 -mx-2"
+                    className="block text-sm text-text-subtle hover:text-text-muted transition-colors"
                   >
                     <span className="pl-22">└─ ANALYSIS</span>
                   </Link>
                 )}
+                <div className="mt-3 flex justify-end">
+                  <div className="border border-border overflow-hidden group-hover:brightness-110 transition-[filter]">
+                    <PieceThumbnail pieceId={piece.id} width={400} height={200} />
+                  </div>
+                </div>
               </div>
             ))}
           </div>

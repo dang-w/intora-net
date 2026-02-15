@@ -153,9 +153,10 @@ function getColor(magnitude: number, phase: Phase): string {
 interface PieceProps {
   width: number;
   height: number;
+  fps?: number;
 }
 
-export default function INT001Drift({ width, height }: PieceProps) {
+export default function INT001Drift({ width, height, fps }: PieceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -207,11 +208,21 @@ export default function INT001Drift({ width, height }: PieceProps) {
     let cycleState = initCycle(performance.now());
     let animationId: number;
 
+    // Frame throttling
+    const frameDuration = fps ? 1000 / fps : 0;
+    let lastRenderTime = 0;
+
     // Dot animation for reacquisition
     let lastDotTime = 0;
     let dotCount = 1;
 
     function render(timestamp: number) {
+      if (frameDuration && timestamp - lastRenderTime < frameDuration) {
+        animationId = requestAnimationFrame(render);
+        return;
+      }
+      lastRenderTime = timestamp;
+
       cycleState = updatePhase(cycleState, timestamp);
 
       const phaseElapsed = timestamp - cycleState.phaseStartTime;

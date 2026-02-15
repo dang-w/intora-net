@@ -1,18 +1,8 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { PALETTE } from '@/lib/palette';
+import { PIECE_COMPONENTS } from '@/lib/pieceComponents';
 import PiecePlaceholder from '@/components/pieces/PiecePlaceholder';
-
-const INT001Drift = dynamic(() => import('@/components/pieces/INT001Drift'), {
-  ssr: false,
-  loading: () => <div style={{ background: PALETTE.bg, width: '100%', height: '100%' }} />,
-});
-
-const PIECE_COMPONENTS: Record<string, React.ComponentType<{ width: number; height: number }>> = {
-  '001': INT001Drift,
-};
 
 interface PieceClientProps {
   pieceId: string;
