@@ -10,7 +10,7 @@ The site presents as a terminal-style signal archive — every element, from the
 |---|-------|-------------|
 | INT/001 | DRIFT | Flow field rendered through oriented text characters |
 
-Each piece has an accompanying **analysis** page documenting the concept, technique, and iteration history.
+Each piece has an accompanying **analysis** page documenting the concept, technique, and iteration history. The catalogue renders live Canvas thumbnails of each piece.
 
 ## Constraints
 
@@ -21,7 +21,7 @@ Each piece has an accompanying **analysis** page documenting the concept, techni
 
 ## Stack
 
-Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Geist fonts, static generation on Vercel.
+Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Geist fonts, Tone.js (audio scaffold), static generation on Vercel.
 
 ## Development
 
