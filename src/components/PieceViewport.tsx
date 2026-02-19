@@ -31,13 +31,17 @@ export default function PieceViewport({ piece, children }: PieceViewportProps) {
           )}
         </div>
         <div className="flex items-center gap-4">
-          {piece.hasAudio && <AudioToggle />}
           <span>intora.net</span>
         </div>
       </div>
       <div className="flex-1 overflow-hidden">
         {children}
       </div>
+      {piece.hasAudio && (
+        <div className="flex h-8 shrink-0 items-center justify-center px-4 text-xs">
+          <AudioToggle />
+        </div>
+      )}
     </div>
   );
 

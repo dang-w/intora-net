@@ -12,6 +12,18 @@ export const pieces: PieceMeta[] = [
     version: '1.0',
     lastModified: '2026-02-15',
   },
+  {
+    id: '002',
+    designation: 'INT/002',
+    subtitle: 'STATION',
+    status: 'live',
+    date: '2026-02-19',
+    description: 'Number station intercept — signal emerges from noise, transmits, decodes, and is lost',
+    hasAudio: true,
+    hasAnalysis: true,
+    version: '1.0',
+    lastModified: '2026-02-19',
+  },
 ];
 
 export function getPiece(id: string): PieceMeta | undefined {

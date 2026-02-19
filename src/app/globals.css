@@ -49,3 +49,8 @@ html, body {
   background-color: var(--color-accent);
   color: var(--color-bg);
 }
+
+@keyframes muted-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
